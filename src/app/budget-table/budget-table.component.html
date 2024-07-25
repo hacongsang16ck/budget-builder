@@ -1,0 +1,55 @@
+<table class="border border-gray-400 border-collapse">
+  <thead>
+    <tr>
+      <th>
+        <input type="text" [(ngModel)]="nameBudget" />
+      </th>
+      <th>
+        <div class="flex justify-start">
+            <input 
+                type="month"
+                id="start"
+                [max]="endDate()"
+                (change)="changeDate($event, startDate)" />
+        </div>
+      </th>
+      <th>
+        <div class="flex justify-start">
+            <input 
+                type="month" 
+                id="end" 
+                [min]="startDate()" 
+                (change)="changeDate($event, endDate)" />
+        </div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+        <th class="text-left" colspan="3">Income</th>
+    </tr>
+    @for (item of budgetTable(); track $index) {
+        <tr>
+            <td>
+                <input type="text" [(ngModel)]="item.firstCol" />
+            </td>
+            <td>
+                <input type="text" [(ngModel)]="item.secondCol" />
+            </td>
+            <td>
+                <input type="text" [(ngModel)]="item.thirdCol" />
+            </td>
+        </tr>
+    }
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>Total Expenses</td>
+      <td>12345</td>
+      <td>20000</td>
+    </tr>
+  </tfoot>
+</table>
+<div class="mx-2 flex justify-end">
+  <button (click)="addNewRow()">add new row</button>
+</div>
