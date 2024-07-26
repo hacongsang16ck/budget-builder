@@ -10,7 +10,21 @@ th, td{
 input {
     @apply w-full
 }
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 
 button{
     @apply border bg-blue-200 rounded py-1 px-2
+}
+th{
+    @apply text-left
 }

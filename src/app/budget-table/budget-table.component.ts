@@ -1,10 +1,23 @@
-import { Component, effect, OnInit, Signal, signal, WritableSignal } from '@angular/core';
-import { budgetRow } from './budget-table-model/budget-table.model';
+import { Component, computed, effect, OnInit, signal } from '@angular/core';
+import { BudgetCategories, BudgetTable, Category, Row } from './budget-table-model/budget-table.model';
 
-const initialState : budgetRow = {
-  firstCol: '',
-  secondCol: '',
-  thirdCol: ''
+const initialRowState : Row = {
+  title: '',
+  start: 0,
+  end: 0
+}
+const initialCategoryState: Category = {
+  header: initialRowState,
+  children: [],
+  footer: {...initialRowState, title: 'Sub Total'}
+}
+const initialBudgetCategoriesState: BudgetCategories = {
+  categories: [initialCategoryState],
+  total: initialRowState
+}
+const initialTableState : BudgetTable = {
+  incomes: [initialBudgetCategoriesState],
+  expenses: [initialBudgetCategoriesState]
 }
 
 @Component({
@@ -15,30 +28,61 @@ const initialState : budgetRow = {
 
 export class BudgetTableComponent implements OnInit {
 
+  title = 'budget-builder';
+
+  nameBudget = signal('Start Period V End V');
+
+  startDate = signal('');
+  endDate = signal('');
+
+  month = computed(()=> {
+    const start = new Date(this.startDate());
+    const end = new Date(this.endDate());
+    return this.calculatorMonth(start, end);
+  })
+
+  //calculator when have month
+  budgetTable = computed(()=> {
+    let table: BudgetTable[] = [];
+    for(let i = 1; i <= this.month(); i++){
+      let newTable:BudgetTable = JSON.parse(JSON.stringify(initialTableState));
+      newTable.incomes[0].categories[0].header.title = "General Income"
+      newTable.expenses[0].categories[0].header.title = "Operational Expenses"
+      table.push(newTable);
+    }
+    return table;
+  })
+
+  totalBudget = computed(()=>{
+    this.budgetTable().forEach(value => {
+      // value.tables.forEach(table => {
+
+      // })
+    })
+  })
+
   constructor() {
     effect(()=>{
       console.log(this.nameBudget())
       console.log(this.startDate())
-      console.log(this.endDate())
+      console.log(this.budgetTable())
     })
   }
 
   ngOnInit(): void {
   }
-  title = 'budget-builder';
-  nameBudget = signal('Start Period V End Period V');
-  startDate = signal('');
-  endDate = signal('');
-
-  budgetTable: WritableSignal<budgetRow[]> = signal([]);
 
   addNewRow(){
-    this.budgetTable.update(rows => [...rows, {...initialState}]);
+    //this.budgetDetail.update(rows => [...rows, {...initialRowState}]);
   }
 
-  changeDate(event: Event, signal: WritableSignal<string>){
-    const input = event.target as HTMLInputElement;
-    signal.set(input.value);
-  }
+  calculatorMonth(start: Date, end: Date): number{
+    // Calculate the difference in months
+    const startYear = start.getFullYear();
+    const startMonth = start.getMonth();
+    const endYear = end.getFullYear();
+    const endMonth = end.getMonth();
 
+    return (endYear - startYear) * 12 + (endMonth - startMonth);
+  }
 }
