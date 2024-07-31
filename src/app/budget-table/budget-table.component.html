@@ -28,120 +28,149 @@
     </tr>
   </thead>
   <!-- body  -->
-  @for(item of budgetTable(); track $index){ @for (income of item.incomes; track
-  $index) {
-  <tbody>
-    <!-- Income  -->
-    <tr>
-      <th colspan="3" class="text-left">Income</th>
-    </tr>
-    @for (category of income.categories; track $index) {
-    <tr>
-      <th>
-        {{ category.header.title }}
-      </th>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="category.header.start" />
-      </td>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="category.header.end" />
-      </td>
-    </tr>
-    <!-- body -->
-    @for (child of category.children; track $index) {
-    <tr>
-      <td>
-        <input type="text" [(ngModel)]="child.title" />
-      </td>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="child.start" />
-      </td>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="child.end" />
-      </td>
-    </tr>
-    }
-    <!-- Add new row -->
-    <ng-container *ngTemplateOutlet="addRow; context: {'param':'Add a new ‘'+category.header.title+'’ Category'}"></ng-container>
-    <!-- footer -->
-    <tr>
-      <td>
-        {{category.footer.title}}
-      </td>
-      <td class="text-right">
-        {{category.footer.start}}
-      </td>
-      <td class="text-right">
-        {{category.footer.end}}
-      </td>
-    </tr>
-    <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
-    }
-    <!-- Expenses  -->
-    <tr>
-      <th colspan="3" class="text-left">Expenses</th>
-    </tr>
-    @for (expense of item.expenses; track $index) { @for (category of
-    expense.categories; track $index) {
-    <!-- header  -->
-    <tr>
-      <th>
-        {{ category.header.title }}
-      </th>
-      <td>
-        <input type="number" min="0" min="0" class="text-right" [(ngModel)]="category.header.start" />
-      </td>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="category.header.end" />
-      </td>
-    </tr>
-    <!-- body -->
-    @for (child of category.children; track $index) {
-    <tr>
-      <td>
-        <input type="text" [(ngModel)]="child.title" />
-      </td>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="child.start" />
-      </td>
-      <td>
-        <input type="number" min="0" class="text-right" [(ngModel)]="child.end" />
-      </td>
-    </tr>
-    }
-    <!-- Add new row -->
-    <ng-container *ngTemplateOutlet="addRow; context: {'param':'Add a new ‘'+category.header.title+'’ Category'}"></ng-container>
-    <!-- footer -->
-    <tr>
-      <td>
-        {{category.footer.title}}
-      </td>
-      <td class="text-right">
-        {{category.footer.start}}
-      </td>
-      <td class="text-right">
-        {{category.footer.end}}
-      </td>
-    </tr>
-    <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
-    } }
-  </tbody>
-  } } @if (budgetTable().length) {
+  @for(item of tableBudget(); track $index)
+  { 
+    <tbody>
+        <tr>
+            <th colspan="3" class="text-left">Income</th>
+        </tr>
+        @for (income of item.incomes; track $index) {
+            <!-- Income  -->
+            <tr>
+              <th>
+                  <input #inputElement [(ngModel)]="income.header.title" />
+              </th>
+              <td>
+                  <input #inputElement (contextmenu)="onRightClick($event, income.header.start, income, 'start')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="income.header.start" />
+              </td>
+              <td>
+                  <input #inputElement (contextmenu)="onRightClick($event, income.header.end, income, 'end')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="income.header.end" />
+              </td>
+            </tr>
+            <!-- body -->
+            @for (child of income.children; track $index) {
+            <tr>
+              <td>
+                  <input #inputElement type="text" [(ngModel)]="child.title" />
+              </td>
+              <td>
+                  <input #inputElement (contextmenu)="onRightClick($event, child.start, income, 'start')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="child.start" />
+              </td>
+              <td>
+                  <input #inputElement (contextmenu)="onRightClick($event, child.end, income, 'end')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="child.end" />
+              </td>
+            </tr>
+            }
+            <!-- Add new row -->
+            <ng-container *ngTemplateOutlet="addRow; context: {'name':'Add a new ‘'+income.header.title+'’ Category', 'param':income.children, 'parent':false}"></ng-container>
+              <!-- footer -->
+            <tr>
+              <th>
+                  {{income.footer.title}}
+              </th>
+              <td class="text-right">
+                  {{income.footer.start}}
+              </td>
+              <td class="text-right">
+                  {{income.footer.end}}
+              </td>
+            </tr>
+            <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
+        }
+        <!-- Add parent  -->
+        <ng-container *ngTemplateOutlet="addRow; context: {'name':'Add a new Parent Category','param':item.incomes, 'parent':true}"></ng-container>
+        <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
+          <tr>
+            <th>
+                {{item.totalIncome.title}}
+            </th>
+            <td class="text-right">
+                {{item.totalIncome.start}}
+            </td>
+            <td class="text-right">
+                {{item.totalIncome.end}}
+            </td>
+          </tr>
+        <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
+      <!-- Expenses  -->
+      <tr>
+        <th colspan="3" class="text-left">Expenses</th>
+      </tr>
+      @for (expense of item.expenses; track $index) {
+        <!-- header  -->
+      <tr>
+        <th>
+            <input #inputElement [(ngModel)]="expense.header.title" />
+        </th>
+        <td>
+          <input #inputElement (contextmenu)="onRightClick($event, expense.header.start, expense, 'start')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="expense.header.start" />
+        </td>
+        <td>
+          <input #inputElement (contextmenu)="onRightClick($event, expense.header.end, expense, 'end')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="expense.header.end" />
+        </td>
+      </tr>
+      <!-- body -->
+      @for (child of expense.children; track $index) {
+      <tr>
+        <td>
+          <input #inputElement type="text" [(ngModel)]="child.title" />
+        </td>
+        <td>
+          <input #inputElement (contextmenu)="onRightClick($event, child.start, expense, 'start')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="child.start" />
+        </td>
+        <td>
+          <input #inputElement (contextmenu)="onRightClick($event, child.end, expense, 'end')" (change)="calculatorTotalCategories()" type="number" min="0" class="text-right" [(ngModel)]="child.end" />
+        </td>
+      </tr>
+      }
+      <!-- Add new row -->
+      <ng-container *ngTemplateOutlet="addRow; context: {'name':'Add a new ‘'+expense.header.title+'’ Category','param':expense.children, 'parent':false}"></ng-container>
+      <!-- footer -->
+      <tr>
+        <th>
+          {{expense.footer.title}}
+        </th>
+        <td class="text-right">
+          {{expense.footer.start}}
+        </td>
+        <td class="text-right">
+          {{expense.footer.end}}
+        </td>
+      </tr>
+      <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
+      }
+      <!-- Add parent  -->
+      <ng-container *ngTemplateOutlet="addRow; context: {'name':'Add a new Parent Category','param':item.expenses, 'parent':true}"></ng-container>
+      <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
+      <tr>
+        <th>
+          {{item.totalExpense.title}}
+        </th>
+        <td class="text-right">
+          {{item.totalExpense.start}}
+        </td>
+        <td class="text-right">
+          {{item.totalExpense.end}}
+        </td>
+      </tr>
+      <ng-container *ngTemplateOutlet="emptyRow"></ng-container>
+    </tbody>
+    } @if (tableBudget().length) {
   <tfoot>
     <tr>
-      <th>Profit / Loss</th>
-      <td class="text-right">12345</td>
-      <td class="text-right">20000</td>
+      <th>{{totalTable().loss.title}}</th>
+      <td class="text-right">{{totalTable().loss.start}}</td>
+      <td class="text-right">{{totalTable().loss.end}}</td>
     </tr>
     <tr>
-      <th>Opening Balance</th>
-      <td class="text-right">12345</td>
-      <td class="text-right">20000</td>
+      <th>{{totalTable().openingBalance.title}}</th>
+      <td class="text-right">{{totalTable().openingBalance.start}}</td>
+      <td class="text-right">{{totalTable().openingBalance.end}}</td>
     </tr>
     <tr>
-      <th>Closing Balance</th>
-      <td class="text-right">12345</td>
-      <td class="text-right">20000</td>
+      <th>{{totalTable().closingBalance.title}}</th>
+      <td class="text-right">{{totalTable().closingBalance.start}}</td>
+      <td class="text-right">{{totalTable().closingBalance.end}}</td>
     </tr>
   </tfoot>
   }
@@ -154,12 +183,25 @@
     <td></td>
   </tr>
 </ng-template>
-<ng-template #addRow let-param="param">
+<ng-template #addRow let-name="name" let-param="param" let-parent="parent">
   <tr class="font-medium h-6">
     <td>
-      <ng-container *ngIf="param">{{ param }}</ng-container>
+        <ng-container *ngIf="parent; else row">
+            <span (click)="addNewParent(param)">{{ name }}</span>
+        </ng-container>
+        <ng-template #row>
+            <span (click)="addNewRow(param)">{{ name }}</span>
+        </ng-template>
     </td>
     <td></td>
     <td></td>
   </tr>
 </ng-template>
+<!-- Context Menu -->
+<div
+  *ngIf="contextMenuVisible()"
+  [ngStyle]="{ top: contextMenuPosition.y, left: contextMenuPosition.x }"
+  class="context-menu"
+>
+  <button (click)="applyToAll()">Apply to all</button>
+</div>

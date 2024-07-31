@@ -7,6 +7,10 @@ th, td{
     @apply border border-gray-400;
 }
 
+td>input {
+  @apply cursor-pointer
+}
+
 input {
     @apply w-full
 }
